@@ -1,0 +1,22 @@
+{
+  "name": "مقياس الحب والعمر والبرج",
+  "short_name": "مقياس الحب",
+  "description": "احسب درجة التوافق بينكما بناءً على الأعمار والأبراج ونسبة الحب",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffafbd",
+  "theme_color": "#ff416c",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://imgur.com/a/soTkFYq",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "https://imgur.com/a/soTkFYq",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ]
+}

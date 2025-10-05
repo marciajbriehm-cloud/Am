@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <title>مقياس الحب والعمر والبرج</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/x-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>">
+  <meta name="theme-color" content="#ff416c">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="مقياس الحب">
+  <meta name="description" content="احسب درجة التوافق بينكما بناءً على الأعمار والأبراج ونسبة الحب">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Tajawal', 'Segoe UI', Tahoma, sans-serif;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    html, body {
+      overscroll-behavior: none;
+      touch-action: manipulation;
+    }
+    body {
+      background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+      min-height: 100vh;
+      padding: 10px;
+      color: #333;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    h1 {
+      color: #d32f2f;
+      margin-bottom: 8px;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+    .subtitle {
+      color: #555;
+      font-size: clamp(0.8rem, 2.5vw, 1rem);
+      margin-bottom: 12px;
+    }
+    .input-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+    .person {
+      flex: 1;
+      min-width: 260px;
+      background: #fff9f9;
+      padding: 20px;
+      border-radius: 15px;
+      border: 2px solid #ffccd5;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      transition: transform 0.3s ease;
+    }
+    .person:hover {
+      transform: translateY(-3px);
+    }
+    .person h3 {
+      margin-bottom: 15px;
+      color: #e91e63;
+      text-align: center;
+      font-size: clamp(1.1rem, 3vw, 1.4rem);
+      position: relative;
+      padding-bottom: 8px;
+    }
+    .person h3::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 2px;
+      background: #ff416c;
+      border-radius: 2px;
+    }
+    label {
+      display: block;
+      margin: 10px 0 5px;
+      font-weight: bold;
+      color: #555;
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+    }
+    select, input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ffb6c1;
+      border-radius: 8px;
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+      background: white;
+      transition: border-color 0.3s;
+    }
+    select:focus, input:focus {
+      outline: none;
+      border-color: #ff416c;
+      box-shadow: 0 0 0 2px rgba(255, 65, 108, 0.2);
+    }
+    button {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(to right, #ff416c, #ff4b2b);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: clamp(0.9rem, 3vw, 1rem);
+      font-weight: bold;
+      cursor: pointer;
+      margin: 20px 0;
+      transition: all 0.3s;
+      box-shadow: 0 4px 10px rgba(255, 65, 108, 0.3);
+    }
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(255, 65, 108, 0.4);
+    }
+    button:active {
+      transform: translateY(0);
+    }
+    .result {
+      display: none;
+      background: #fff0f5;
+      padding: 20px;
+      border-radius: 15px;
+      margin-top: 15px;
+      border: 2px dashed #ff80ab;
+      animation: fadeIn 0.5s ease;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-header {
+      text-align: center;
+      margin-bottom: 15px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #ffb6c1;
+    }
+    .result-header h2 {
+      color: #d32f2f;
+      font-size: clamp(1.2rem, 3vw, 1.5rem);
+    }
+    .result-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 15px;
+    }
+    .result-box {
+      background: white;
+      padding: 18px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.08);
+      margin-bottom: 15px;
+    }
+    .result-box h3 {
+      color: #e91e63;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #ffe0e6;
+      font-size: clamp(1rem, 2.5vw, 1.1rem);
+    }
+    .age-info, .zodiac-info, .love-info, .birthday-info {
+      margin-bottom: 15px;
+    }
+    .love-bar {
+      height: 25px;
+      background: #f0f0f0;
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 12px 0;
+      position: relative;
+    }
+    .love-fill {
+      height: 100%;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+      transition: width 1s ease-in-out;
+    }
+    .comparison {
+      display: flex;
+      justify-content: space-around;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 15px;
+    }
+    .love-direction {
+      text-align: center;
+      padding: 12px;
+      background: white;
+      border-radius: 12px;
+      flex: 1;
+      min-width: 130px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+    .love-direction:hover {
+      transform: scale(1.03);
+    }
+    .love-direction i {
+      font-size: 24px;
+      color: #e91e63;
+      margin-bottom: 8px;
+    }
+    .zodiac-desc {
+      font-style: italic;
+      color: #666;
+      margin-top: 6px;
+      font-size: clamp(0.7rem, 2vw, 0.8rem);
+    }
+    .age-display {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: bold;
+      color: #d32f2f;
+      margin-top: 8px;
+      font-size: clamp(0.8rem, 2vw, 0.9rem);
+    }
+    .birthday-alert {
+      background: #ffebee;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: bold;
+      color: #c62828;
+      margin: 12px 0;
+      border: 2px solid #ffcdd2;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0.4); }
+      70% { box-shadow: 0 0 0 8px rgba(255, 65, 108, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 65, 108, 0); }
+    }
+    .birthday-info h3 {
+      color: #e91e63;
+      margin: 12px 0 8px;
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+    }
+    .birthday-info p {
+      background: #fdf6f7;
+      padding: 10px;
+      border-radius: 10px;
+      margin: 6px 0;
+      border-right: 3px solid #ff80ab;
+      font-size: clamp(0.7rem, 2vw, 0.8rem);
+    }
+    .compatibility {
+      text-align: center;
+      padding: 18px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      margin-top: 15px;
+      border: 1px solid #e0e0e0;
+    }
+    .compatibility h3 {
+      color: #d32f2f;
+      margin-bottom: 12px;
+      font-size: clamp(0.9rem, 2.5vw, 1rem);
+    }
+    .compatibility-text {
+      font-size: clamp(0.8rem, 2.5vw, 0.9rem);
+      line-height: 1.5;
+      color: #555;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 20px;
+      color: #777;
+      font-size: clamp(0.7rem, 2vw, 0.8rem);
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    .reset-btn {
+      background: #6c757d;
+      margin-top: 12px;
+      padding: 10px;
+    }
+    .reset-btn:hover {
+      background: #5a6268;
+    }
+    
+    /* Install button */
+    #installBtn {
+      position: fixed;
+      bottom: 90px;
+      right: 15px;
+      background-color: #fff;
+      color: #ff416c;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+      display: none;
+      z-index: 50;
+      font-size: clamp(0.7rem, 2vw, 0.8rem);
+    }
+    #installBtn:hover {
+      background-color: #ffebee;
+    }
+    
+    /* Offline indicator */
+    .offline-indicator {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: #ff6b6b;
+      color: white;
+      text-align: center;
+      padding: 8px;
+      font-weight: bold;
+      display: none;
+      z-index: 100;
+      font-size: clamp(0.7rem, 2vw, 0.8rem);
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
+      }
+      .container {
+        padding: 15px;
+      }
+      .input-group {
+        flex-direction: column;
+      }
+      .person {
+        min-width: 100%;
+      }
+      .result-content {
+        grid-template-columns: 1fr;
+      }
+      .comparison {
+        flex-direction: column;
+        gap: 15px;
+      }
+      .love-direction {
+        min-width: 100%;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 12px;
+      }
+      .person {
+        padding: 15px;
+      }
+      .result-box {
+        padding: 15px;
+      }
+      .love-direction {
+        padding: 10px;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="offline-indicator" id="offlineIndicator">أنت غير متصل بالإنترنت</div>
+  
+  <div class="container">
+    <div class="header">
+      <h1><i class="fas fa-heart"></i> مقياس الحب والعمر والبرج</h1>
+      <p class="subtitle">احسب درجة التوافق بينكما بناءً على الأعمار والأبراج ونسبة الحب</p>
+    </div>
+
+    <div class="input-group">
+      <div class="person">
+        <h3><i class="fas fa-mars"></i> الحبيب</h3>
+        <label><i class="fas fa-user"></i> الاسم:</label>
+        <input type="text" id="name1" placeholder="أدخل اسم الحبيب">
+        
+        <label><i class="fas fa-calendar-alt"></i> تاريخ الميلاد:</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 5px;">
+          <div>
+            <label>السنة:</label>
+            <select id="year1">
+              <option value="">اختر السنة</option>
+              <script>
+                for (let y = new Date().getFullYear(); y >= 1980; y--) {
+                  document.write(`<option value="${y}">${y}</option>`);
+                }
+              </script>
+            </select>
+          </div>
+          <div>
+            <label>الشهر:</label>
+            <select id="month1">
+              <option value="">الشهر</option>
+              <option value="1">يناير</option>
+              <option value="2">فبراير</option>
+              <option value="3">مارس</option>
+              <option value="4">أبريل</option>
+              <option value="5">مايو</option>
+              <option value="6">يونيو</option>
+              <option value="7">يوليو</option>
+              <option value="8">أغسطس</option>
+              <option value="9">سبتمبر</option>
+              <option value="10">أكتوبر</option>
+              <option value="11">نوفمبر</option>
+              <option value="12">ديسمبر</option>
+            </select>
+          </div>
+          <div>
+            <label>اليوم:</label>
+            <select id="day1">
+              <option value="">اليوم</option>
+              <script>
+                for (let d = 1; d <= 31; d++) {
+                  document.write(`<option value="${d}">${d}</option>`);
+                }
+              </script>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="person">
+        <h3><i class="fas fa-venus"></i> الحبيبة</h3>
+        <label><i class="fas fa-user"></i> الاسم:</label>
+        <input type="text" id="name2" placeholder="أدخل اسم الحبيبة">
+        
+        <label><i class="fas fa-calendar-alt"></i> تاريخ الميلاد:</label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 5px;">
+          <div>
+            <label>السنة:</label>
+            <select id="year2">
+              <option value="">اختر السنة</option>
+              <script>
+                for (let y = new Date().getFullYear(); y >= 1980; y--) {
+                  document.write(`<option value="${y}">${y}</option>`);
+                }
+              </script>
+            </select>
+          </div>
+          <div>
+            <label>الشهر:</label>
+            <select id="month2">
+              <option value="">الشهر</option>
+              <option value="1">يناير</option>
+              <option value="2">فبراير</option>
+              <option value="3">مارس</option>
+              <option value="4">أبريل</option>
+              <option value="5">مايو</option>
+              <option value="6">يونيو</option>
+              <option value="7">يوليو</option>
+              <option value="8">أغسطس</option>
+              <option value="9">سبتمبر</option>
+              <option value="10">أكتوبر</option>
+              <option value="11">نوفمبر</option>
+              <option value="12">ديسمبر</option>
+            </select>
+          </div>
+          <div>
+            <label>اليوم:</label>
+            <select id="day2">
+              <option value="">اليوم</option>
+              <script>
+                for (let d = 1; d <= 31; d++) {
+                  document.write(`<option value="${d}">${d}</option>`);
+                }
+              </script>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="calculate()">
+      <i class="fas fa-calculator"></i> احسب التوافق الآن!
+    </button>
+
+    <div class="result" id="result">
+      <!-- سيتم ملؤه بالجافاسكربت -->
+    </div>
+    
+    <div class="footer">
+      <p>© 2023 مقياس الحب والعمر والبرج - جميع الحقوق محفوظة</p>
+    </div>
+  </div>
+
+  <!-- Install Button -->
+  <button id="installBtn">📱 تثبيت التطبيق</button>
+
+  <script>
+    // دالة دقيقة لتحديد البرج حسب اليوم والشهر
+    function getZodiac(month, day) {
+      const zodiacData = [
+        { name: "الجدي", desc: "مسؤول، طموح، منضبط، لكنه جاد جدًا.", startMonth: 12, startDay: 22, endMonth: 1, endDay: 19 },
+        { name: "الدلو", desc: "مبتكر، مستقل، ودود، لكنه عنيد.", startMonth: 1, startDay: 20, endMonth: 2, endDay: 18 },
+        { name: "الحوت", desc: "رومانسي، حساس، خيالي، لكنه يهرب من الواقع أحيانًا.", startMonth: 2, startDay: 19, endMonth: 3, endDay: 20 },
+        { name: "الحمل", desc: "شجاع، طموح، قيادي، لكنه سريع الغضب.", startMonth: 3, startDay: 21, endMonth: 4, endDay: 19 },
+        { name: "الثور", desc: "صبور، عملي، محب للجمال، وعنيد.", startMonth: 4, startDay: 20, endMonth: 5, endDay: 20 },
+        { name: "الجوزاء", desc: "ذكي، فضولي، اجتماعي، لكنه متقلب.", startMonth: 5, startDay: 21, endMonth: 6, endDay: 20 },
+        { name: "السرطان", desc: "حنون، عاطفي، حنون، لكنه حساس جدًا.", startMonth: 6, startDay: 21, endMonth: 7, endDay: 22 },
+        { name: "الأسد", desc: "واثق، كريم، محب للتمثيل، ويحب الاهتمام.", startMonth: 7, startDay: 23, endMonth: 8, endDay: 22 },
+        { name: "العذراء", desc: "منظم، دقيق، عملي، لكنه نقّاد أحيانًا.", startMonth: 8, startDay: 23, endMonth: 9, endDay: 22 },
+        { name: "الميزان", desc: "دبلوماسي، عادل، يحب الجمال، ويكره الخلاف.", startMonth: 9, startDay: 23, endMonth: 10, endDay: 22 },
+        { name: "العقرب", desc: "غامض، شغوف، ذكي، لكنه غيور.", startMonth: 10, startDay: 23, endMonth: 11, endDay: 21 },
+        { name: "القوس", desc: "متفائل، محب للمغامرة، صريح، لكنه غير ملتزم أحيانًا.", startMonth: 11, startDay: 22, endMonth: 12, endDay: 21 }
+      ];
+
+      for (const sign of zodiacData) {
+        if (sign.startMonth === 12 && sign.endMonth === 1) {
+          // برج الجدي (ينتقل من ديسمبر إلى يناير)
+          if ((month === 12 && day >= sign.startDay) || (month === 1 && day <= sign.endDay)) {
+            return { name: sign.name, desc: sign.desc };
+          }
+        } else {
+          if ((month === sign.startMonth && day >= sign.startDay) ||
+              (month === sign.endMonth && day <= sign.endDay)) {
+            return { name: sign.name, desc: sign.desc };
+          }
+        }
+      }
+
+      // افتراضي (في حال تاريخ غير صالح)
+      return { name: "غير معروف", desc: "تاريخ ميلاد غير صالح." };
+    }
+
+    function calculateAge(birthDate) {
+      const today = new Date();
+      let years = today.getFullYear() - birthDate.getFullYear();
+      let months = today.getMonth() - birthDate.getMonth();
+      let days = today.getDate() - birthDate.getDate();
+
+      if (days < 0) {
+        months--;
+        const lastMonth = new Date(today.getFullYear(), today.getMonth(), 0);
+        days += lastMonth.getDate();
+      }
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      return { years, months, days };
+    }
+
+    function loveScore(name1, name2, seed = 0) {
+      let str = (name1 + name2).toLowerCase().replace(/[^a-z0-9\u0600-\u06FF]/g, '');
+      let hash = 5381;
+      for (let i = 0; i < str.length; i++) {
+        hash = ((hash << 5) + hash) + str.charCodeAt(i);
+      }
+      hash = Math.abs(hash + seed) % 100;
+      return Math.max(60, hash);
+    }
+
+    function nextBirthday(month, day) {
+      const today = new Date();
+      let year = today.getFullYear();
+      if (month < today.getMonth() + 1 || 
+         (month === today.getMonth() + 1 && day < today.getDate())) {
+        year++;
+      }
+      const nextBday = new Date(year, month - 1, day);
+      const diffTime = nextBday - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      return { days: diffDays < 0 ? 0 : diffDays, date: nextBday };
+    }
+
+    function isBirthdayToday(month, day) {
+      const today = new Date();
+      return today.getMonth() + 1 === month && today.getDate() === day;
+    }
+
+    function getBirthdayMessage(name, days, isToday) {
+      if (isToday) {
+        return `<div class="birthday-alert"><i class="fas fa-birthday-cake"></i> 🎂 عيد ميلاد ${name} اليوم! كل عام وأنت بخير!</div>`;
+      } else if (days <= 7) {
+        return `<div class="birthday-alert" style="background:#e8f5e9; color:#2e7d32; border-color:#a5d6a7;">
+          <i class="fas fa-gift"></i> 🎁 عيد ميلاد ${name} بعد ${days} يوم${days === 1 ? '' : 's'}! استعد للتهنئة!
+        </div>`;
+      } else {
+        const months = Math.floor(days / 30);
+        const remainingDays = days % 30;
+        return `<p>عيد ميلاد ${name} بعد: <strong>${months} شهر${months !== 1 ? 'ات' : ''} و${remainingDays} يوم${remainingDays !== 1 ? 'ان' : ''}</strong></p>`;
+      }
+    }
+
+    function getCompatibilityMessage(loveScore, zod1, zod2) {
+      let message = "";
+      
+      if (loveScore >= 90) {
+        message = "علاقة مثالية! أنتما متوافقان بشكل مذهل. حظ سعيد!";
+      } else if (loveScore >= 80) {
+        message = "علاقة قوية! أنتما تملكان الكثير من التوافق. استمتعا بعلاقة رائعة!";
+      } else if (loveScore >= 70) {
+        message = "علاقة جيدة! هناك تفاهم كبير بينكما، لكن تحتاجان إلى بذل بعض الجهد.";
+      } else if (loveScore >= 60) {
+        message = "علاقة متوسطة! هناك بعض التوافق، لكن تحتاجان إلى تطوير العلاقة.";
+      } else {
+        message = "تحتاجان إلى بذل مجهود أكبر لتحسين العلاقة. التواصل هو المفتاح!";
+      }
+      
+      return message;
+    }
+
+    function calculate() {
+      const name1 = document.getElementById("name1").value.trim();
+      const name2 = document.getElementById("name2").value.trim();
+      
+      const year1 = document.getElementById("year1").value;
+      const month1 = parseInt(document.getElementById("month1").value);
+      const day1 = parseInt(document.getElementById("day1").value);
+      
+      const year2 = document.getElementById("year2").value;
+      const month2 = parseInt(document.getElementById("month2").value);
+      const day2 = parseInt(document.getElementById("day2").value);
+
+      if (!name1 || !name2 || !year1 || !month1 || !day1 || !year2 || !month2 || !day2) {
+        alert("يرجى ملء جميع الحقول!");
+        return;
+      }
+
+      const date1 = new Date(year1, month1 - 1, day1);
+      const date2 = new Date(year2, month2 - 1, day2);
+
+      // تحقق من صحة التاريخ (مثل 31 فبراير)
+      if (date1.getFullYear() != year1 || date1.getMonth() != month1 - 1 || date1.getDate() != day1 ||
+          date2.getFullYear() != year2 || date2.getMonth() != month2 - 1 || date2.getDate() != day2) {
+        alert("تاريخ غير صحيح! تأكد من الأيام (مثل: فبراير لا يحتوي على 30 يومًا).");
+        return;
+      }
+
+      const age1 = calculateAge(date1);
+      const age2 = calculateAge(date2);
+
+      const zod1 = getZodiac(month1, day1);
+      const zod2 = getZodiac(month2, day2);
+
+      const loveGeneral = loveScore(name1, name2);
+      const love1to2 = loveScore(name1, name2, 1);
+      const love2to1 = loveScore(name2, name1, 2);
+
+      let color = "#ff416c";
+      if (loveGeneral >= 90) color = "#4caf50";
+      else if (loveGeneral >= 80) color = "#ff9800";
+      else if (loveGeneral >= 70) color = "#f44336";
+
+      const bday1 = nextBirthday(month1, day1);
+      const bday2 = nextBirthday(month2, day2);
+      const isBday1Today = isBirthdayToday(month1, day1);
+      const isBday2Today = isBirthdayToday(month2, day2);
+
+      const msg1 = getBirthdayMessage(name1, bday1.days, isBday1Today);
+      const msg2 = getBirthdayMessage(name2, bday2.days, isBday2Today);
+
+      const ageDisplay1 = `<div class="age-display"><i class="fas fa-birthday-cake"></i> ${age1.years} سنة، ${age1.months} شهر، ${age1.days} يوم</div>`;
+      const ageDisplay2 = `<div class="age-display"><i class="fas fa-birthday-cake"></i> ${age2.years} سنة، ${age2.months} شهر، ${age2.days} يوم</div>`;
+
+      let alerts = '';
+      if (isBday1Today && isBday2Today) {
+        alerts = '<div class="birthday-alert"><i class="fas fa-birthday-cake"></i> 🎉 عيد ميلاد مزدوج! كلاكما يحتفل اليوم!</div>';
+      } else {
+        if (msg1.includes('alert')) alerts += msg1;
+        if (msg2.includes('alert')) alerts += msg2;
+      }
+
+      const compatibilityMessage = getCompatibilityMessage(loveGeneral, zod1, zod2);
+
+      document.getElementById("result").innerHTML = `
+        <div class="result-header">
+          <h2><i class="fas fa-heart"></i> نتائج التوافق بين ${name1} و${name2}</h2>
+          <p>تحليل شامل لعلاقتكما بناءً على العمر، البرج، ونسبة الحب</p>
+        </div>
+        
+        ${alerts}
+
+        <div class="result-content">
+          <div class="result-box">
+            <div class="age-info">
+              <h3><i class="fas fa-birthday-cake"></i> الأعمار</h3>
+              <p><strong>${name1}:</strong> ${ageDisplay1}</p>
+              <p><strong>${name2}:</strong> ${ageDisplay2}</p>
+            </div>
+          </div>
+          
+          <div class="result-box">
+            <div class="zodiac-info">
+              <h3><i class="fas fa-star"></i> الأبراج والصفات</h3>
+              <p><strong>${name1} (${zod1.name}):</strong> <span class="zodiac-desc">${zod1.desc}</span></p>
+              <p><strong>${name2} (${zod2.name}):</strong> <span class="zodiac-desc">${zod2.desc}</span></p>
+            </div>
+          </div>
+          
+          <div class="result-box">
+            <div class="birthday-info">
+              <h3><i class="fas fa-calendar-day"></i> موعد عيد الميلاد القادم</h3>
+              ${!msg1.includes('alert') ? msg1 : ''}
+              ${!msg2.includes('alert') ? msg2 : ''}
+            </div>
+          </div>
+          
+          <div class="result-box">
+            <div class="love-info">
+              <h3><i class="fas fa-heart"></i> مقياس الحب بينكما: ${loveGeneral}%</h3>
+              <div class="love-bar">
+                <div class="love-fill" style="width: ${loveGeneral}%; background: ${color};">
+                  ${loveGeneral}%
+                </div>
+              </div>
+            </div>
+            
+            <div class="comparison">
+              <div class="love-direction">
+                <i class="fas fa-heart"></i>
+                <p><strong>${name1}</strong></p>
+                <p>يحب <strong>${name2}</strong></p>
+                <p style="font-size:20px; color:#e91e63;">${love1to2}%</p>
+              </div>
+              <div class="love-direction">
+                <i class="fas fa-heart"></i>
+                <p><strong>${name2}</strong></p>
+                <p>تحب <strong>${name1}</strong></p>
+                <p style="font-size:20px; color:#e91e63;">${love2to1}%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="compatibility">
+          <h3><i class="fas fa-hands-helping"></i> توافق الأبراج</h3>
+          <p class="compatibility-text">${compatibilityMessage}</p>
+        </div>
+        
+        <button class="reset-btn" onclick="resetForm()">
+          <i class="fas fa-redo"></i> حساب مجددًا
+        </button>
+      `;
+
+      document.getElementById("result").style.display = "block";
+    }
+    
+    function resetForm() {
+      document.getElementById("name1").value = "";
+      document.getElementById("name2").value = "";
+      document.getElementById("year1").value = "";
+      document.getElementById("month1").value = "";
+      document.getElementById("day1").value = "";
+      document.getElementById("year2").value = "";
+      document.getElementById("month2").value = "";
+      document.getElementById("day2").value = "";
+      document.getElementById("result").style.display = "none";
+    }
+    
+    // Service Worker and PWA functionality
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('service-worker.js')
+          .then(registration => {
+            console.log('✅ Service Worker Registered');
+          })
+          .catch(error => {
+            console.log('❌ Service Worker Registration Failed:', error);
+          });
+      });
+    }
+    
+    // Install button functionality
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+    
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.style.display = 'block';
+    });
+    
+    installBtn.addEventListener('click', async () => {
+      if (deferredPrompt) {
+        installBtn.style.display = 'none';
+        deferredPrompt.prompt();
+        const choice = await deferredPrompt.userChoice;
+        if (choice.outcome === 'accepted') {
+          console.log('✅ تم تثبيت التطبيق');
+        } else {
+          console.log('❌ تم إلغاء التثبيت');
+        }
+        deferredPrompt = null;
+      }
+    });
+    
+    // Offline indicator
+    const offlineIndicator = document.getElementById('offlineIndicator');
+    
+    window.addEventListener('online', () => {
+      offlineIndicator.style.display = 'none';
+    });
+    
+    window.addEventListener('offline', () => {
+      offlineIndicator.style.display = 'block';
+    });
+    
+    // Check current connection status
+    if (!navigator.onLine) {
+      offlineIndicator.style.display = 'block';
+    }
+  </script>
+</body>
+</html>
